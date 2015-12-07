@@ -31,7 +31,7 @@
     (scale-for-sensitivity x))
   (define y-scaled
     (scale-for-sensitivity y))
-  (define n (new-dir-and-ang o x-scaled y-scaled t))
+  (define n (new-vel-dir-and-ang o x-scaled y-scaled t))
   (cond
     [(equal? e "left-down")
      (on-shoot
@@ -42,8 +42,9 @@
       o
       [pos (current-pos o t)]
       [time t]
-      [dir (first n)]
-      [roll (second n)])]))
+      [vel (first n)]
+      [dir (second n)]
+      [roll (third n)])]))
 
 (define (scale-for-sensitivity unknown-x)
   (define negateorone
@@ -88,7 +89,7 @@
     TESTORB
     [dir -x])))
 
-(define (new-dir-and-ang o x y t)
+(define (new-vel-dir-and-ang o x y t)
   (define-values (oldyaw oldpitch) (dir->angles (orb-dir o)))
   (adjust-for-mouse-y
    (adjust-for-mouse-x
@@ -103,17 +104,24 @@
 
 ;;takes list of a dir and ang and o x y t-> list of dir and ang
 (define (adjust-for-mouse-y l o x y t)
-  (define d (first l))
-  (define pd (rotate-right d #:roll (second l)))
+  (define v (first l))
+  (define d (second l))
+  (define pv (rotate-right v #:roll (third l)))
+  (define pd (rotate-right d #:roll (third l)))
   (cond
     [(equal? y 0)
      l]
     [else
+     (define new-vel
+       (rotate-around-dir v
+                          pv
+                          (/ (- y) 2)))
      (define new-dir
        (rotate-around-dir d
                           pd
                           (/ (- y) 2)))
      (list
+      new-vel
       new-dir
       ;; Find the new angle to keep pd the same next time:
       (- (dir-up-to-roll new-dir pd) 90))]))
@@ -121,19 +129,28 @@
 ;;yaw is rotation about z axis, so we compare x positions
 ;;gives a list of dir and ang
 (define (adjust-for-mouse-x o x y t)
+  (define v (orb-vel o))
   (define d (orb-dir o))
-  (define pd (rotate-up (orb-dir o) #:roll (current-roll o t)))
+  (define roll (current-roll o t))
+  (define pv (rotate-up v #:roll roll))
+  (define pd (rotate-up d #:roll roll))
   (cond
     [(equal? x 0)
      (list
+      v
       d
-      (current-roll o t))]
+      roll)]
     [else
+     (define new-vel
+       (rotate-around-dir v
+                          pv
+                          (/ (- x) 2)))
      (define new-dir
        (rotate-around-dir d
                           pd
                           (/ (- x) 2)))
      (list
+      new-vel
       new-dir
       ;; Find the new roll to keep pd the same next time:
       (dir-up-to-roll new-dir pd))]))

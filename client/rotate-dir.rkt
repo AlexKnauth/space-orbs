@@ -6,14 +6,17 @@
 ;;rotates to-rotate around around, counterclockwise looking in the direction of around
 (define (rotate-around-dir to-rotate around ang)
   (define normal-around (dir-normalize around))
-  (rotate-around-coordinates
-   (dir-dx to-rotate)
-   (dir-dy to-rotate)
-   (dir-dz to-rotate)
-   (dir-dx normal-around)
-   (dir-dy normal-around)
-   (dir-dz normal-around)
-   ang))
+  (cond [(false? normal-around)
+         to-rotate]
+        [else
+         (rotate-around-coordinates
+          (dir-dx to-rotate)
+          (dir-dy to-rotate)
+          (dir-dz to-rotate)
+          (dir-dx normal-around)
+          (dir-dy normal-around)
+          (dir-dz normal-around)
+          ang)]))
 
 ;;takes two sets of coordinates and an angle -> dir
 ;;rotates point x y z around origin and u v w
@@ -97,8 +100,11 @@
 ;;rotates the dir "up" by the angle and around the dir by roll
 ;;finds "up" with a dir and roll
 (define (rotate-up d [ang 90] #:roll [roll 0])
-  (define-values (yaw pitch) (dir->angles d))
-  (rotate-around-dir (angles->dir yaw (+ pitch ang)) d roll))
+  (cond [(= 0 (dir-dx d) (dir-dy d) (dir-dz d))
+         d]
+        [else
+         (define-values (yaw pitch) (dir->angles d))
+         (rotate-around-dir (angles->dir yaw (+ pitch ang)) d roll)]))
 
 (module+ test
   (check-equal?
@@ -113,8 +119,11 @@
 ;;rotates the dir "down" by the angle and around the dir by roll
 ;;finds "down" with a dir and roll
 (define (rotate-down d [ang 90] #:roll [roll 0])
-  (define-values (yaw pitch) (dir->angles d))
-  (rotate-around-dir (angles->dir yaw (- pitch ang)) d roll))
+  (cond [(= 0 (dir-dx d) (dir-dy d) (dir-dz d))
+         d]
+        [else
+         (define-values (yaw pitch) (dir->angles d))
+         (rotate-around-dir (angles->dir yaw (- pitch ang)) d roll)]))
 
 (module+ test
   (check-equal?
@@ -129,8 +138,11 @@
 ;;rotates the dir "right" by the angle and around the dir by roll
 ;;finds "right" with a dir and roll
 (define (rotate-right d [ang 90] #:roll [roll 0])
-  (rotate-around-dir
-   d (rotate-up d #:roll roll) (- ang)))
+  (cond [(= 0 (dir-dx d) (dir-dy d) (dir-dz d))
+         d]
+        [else
+         (rotate-around-dir
+          d (rotate-up d #:roll roll) (- ang))]))
 
 (module+ test
   (check-equal?
@@ -145,8 +157,11 @@
 ;;rotates the dir "left" by the angle and around the dir by roll
 ;;finds "left" with a dir and roll
 (define (rotate-left d [ang 90] #:roll [roll 0])
-  (rotate-around-dir
-   d (rotate-up d #:roll roll) ang))
+  (cond [(= 0 (dir-dx d) (dir-dy d) (dir-dz d))
+         d]
+        [else
+         (rotate-around-dir
+          d (rotate-up d #:roll roll) ang)]))
 
 (module+ test
   (check-equal?
