@@ -20,7 +20,8 @@
    (orbs (orb DEFAULTPOS DEFAULTVEL 0 '() DEFAULTDIR 0 empty 0 "1" "blue" #f #f 0 0) empty)
    #f
    #f
-   0))
+   0
+   (set)))
 (define DEFAULT-ORB (orb DEFAULTPOS DEFAULTVEL 0 '() DEFAULTDIR 0 empty 0 "1" "blue" #f #f 0 0))
 
 (define ORB-RADIUS 2)
