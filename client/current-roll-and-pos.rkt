@@ -1,6 +1,6 @@
 #lang racket
 (require pict3d rackunit pict3d/universe mzlib/string "structures.rkt" "variables.rkt" "rotate-dir.rkt" "landscape.rkt" "collision-detection.rkt")
-(provide current-pos current-roll)
+(provide current-pos current-roll key-velocity)
 ;;this is where all the magic happens.
 
 (define (current-roll o t)
@@ -39,12 +39,7 @@
 
 ;;takes an orb and time and gives current position of the orb
 (define (current-pos o t)
-  (define ms (orb-movekeys o))
-  (cond
-    [(equal? ms '())
-     (orb-pos o)]
-    [else
-     (adjust-pos (orb-movekeys o) (orb-dir o) (orb-pos o) (- t (orb-time o)) t (current-roll o t))]))
+  (adjust-pos (orb-pos o) (orb-vel o) (- t (orb-time o))))
 
 (module+ test (check-equal?
                (current-pos TESTORB 8)
@@ -90,13 +85,15 @@
                                           [time 5]) 7))
                (pos 1 1 0)))
 
-;;pos, list of movekeys, a dir, deltatime, and time-> ajusted position of the orb for the axis
-(define (adjust-pos ms d p dt t ang)
-  (cond
-    [(empty? ms)
-     p]
-    [else
-     (adjust-pos (rest ms) d (adjust-one-key (first ms) d p dt ang) dt t ang)]))
+;;pos, vel, and delta-time -> ajusted position of the orb
+(define (adjust-pos pos vel dt)
+  (cond [(= 0 (dir-dx vel) (dir-dy vel) (dir-dz vel)) pos]
+        [else
+         (move-with-collision*
+          pos
+          vel
+          dt
+          FINAL-LANDSCAPE)]))
 
 ;; key, speed, dir, and angle -> velocity
 ;; pd is d adjusted by 90 degrees for pitch, and yd is adjusted 90 degrees for
@@ -120,15 +117,3 @@
      (dir-scale pd s)]
     [else
      (error 'key-velocity "unrecognized key: ~v" k)]))
-
-;;movekey, dir, pos, delta-time, and angle -> pos
-(define (adjust-one-key mk d p dt ang)
-  (cond
-    [(member (movekey-key mk) '("w" "a" "s" "d" "shift" " "))
-     (move-with-collision*
-      p
-      (key-velocity (movekey-key mk) (movekey-speed mk) d ang)
-      dt
-      FINAL-LANDSCAPE)]
-    [else
-     p]))

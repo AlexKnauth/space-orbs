@@ -1,5 +1,5 @@
 #lang racket
-(require rackunit pict3d "structures.rkt" "current-roll-and-pos.rkt" "variables.rkt" "big-crunch.rkt" "on-frame.rkt")
+(require rackunit lens pict3d "structures.rkt" "current-roll-and-pos.rkt" "variables.rkt" "big-crunch.rkt" "on-frame.rkt")
 (provide on-key on-release)
 
 (define (find-this-movekey key ms)
@@ -45,14 +45,33 @@
   result)
 
 (define (on-player-key-result o n t lkey)
-  (struct-copy orb o
-               [pos (current-pos o t)]
-               [time t]
-               [movekeys (cons (movekey lkey STARTING-SPEED)  (orb-movekeys o))]
-               [roll (current-roll o t)]))
+  (define roll (current-roll o t))
+  (cond
+    [(member lkey '("w" "a" "s" "d" " " "shift"))
+     (struct-copy orb o
+                  [pos (current-pos o t)]
+                  [time t]
+                  [vel (dir+ (orb-vel o)
+                             (key-velocity lkey STARTING-SPEED (orb-dir o) roll))]
+                  [roll roll])]
+    [else
+     (struct-copy orb o
+                  [pos (current-pos o t)]
+                  [time t]
+                  [movekeys (cons (movekey lkey STARTING-SPEED)  (orb-movekeys o))]
+                  [roll roll])]))
 
-(module+ test (check-equal? (on-player-key (struct-copy orb TESTORB [pos (pos 2 2 2)] [movekeys empty]) "n" 5 "shift")
-              (struct-copy orb TESTORB [pos (pos 2 2 2)] [movekeys (list (movekey "shift" STARTING-SPEED))])))
+(module+ test
+  (check-equal? (lens-transform
+                 orb-vel-lens
+                 (on-player-key (struct-copy orb TESTORB [pos (pos 2 2 2)] [dir -x]) "n" 5 "shift")
+                 (lambda (vel)
+                   (match (round-dir vel)
+                     [(dir x y z)
+                      (dir (if (zero? x) 0 x)
+                           (if (zero? y) 0 y)
+                           (if (zero? z) 0 z))])))
+                (struct-copy orb TESTORB [pos (pos 2 2 2)] [dir -x] [vel (dir 0 0 (- STARTING-SPEED))])))
 
 ;#############################################################################################################################################################################################
 
