@@ -64,6 +64,8 @@
    o
    [pos
     (pos->mypos (orb-pos o))]
+   [vel
+    (dir->mydir (orb-vel o))]
    [dir
     (dir->mydir (orb-dir o))]
    [shots
@@ -94,21 +96,18 @@
                 )))
 
 (define (shots-convert-to-mypos l)
-  (cond
-    [(empty? l)
-     empty]
-    [else
-     (cons
-      (struct-copy
-       shot
-       (first l)
-       [pos
-        (pos->mypos (shot-pos (first l)))]
-       [corner1
-        (pos->mypos (shot-corner1 (first l)))]
-       [corner2
-        (pos->mypos (shot-corner2 (first l)))])
-      (shots-convert-to-mypos (rest l)))]))
+  (map shot-convert-to-mypos l))
+
+(define (shot-convert-to-mypos s)
+  (struct-copy
+   shot
+   s
+   [pos
+    (pos->mypos (shot-pos s))]
+   [corner1
+    (pos->mypos (shot-corner1 s))]
+   [corner2
+    (pos->mypos (shot-corner2 s))]))
 
 ;;orb-> orb with mypos and mydir instead of pos and dir
 (define (convert-to-pos o)
@@ -117,6 +116,8 @@
    o
    [pos
     (mypos->pos (orb-pos o))]
+   [vel
+    (mydir->dir (orb-vel o))]
    [dir
     (mydir->dir (orb-dir o))]
    [shots
@@ -151,6 +152,8 @@
     (struct-copy orb TESTORB
                  [pos
                   (mypos 1 1 1)]
+                 [vel
+                  (mydir 0 0 0)]
                  [dir
                   (mydir -1 0 0)]
                  [shots
@@ -265,6 +268,7 @@
                    DEFAULTPOS2]
                   [else
                    DEFAULTPOS])]
+               [vel DEFAULTVEL]
                [movekeys empty]
                [dir DEFAULTDIR2]
                [roll 0]))

@@ -7,11 +7,12 @@
 ;corner 1 and 2 are pos for drawing and pos is where to move it
 ;time is time in milliseconds when it was shot
 (struct/lens shot (corner1 corner2 pos yaw pitch time) #:prefab)
-;;position and time at last key change.list of moves. Pos is a list of 3 coordinates that is current. (continue on next line)
+;;position, velocity, and time at last key change.list of moves.
+;;Pos is a list of 3 coordinates that is current. (continue on next line)
 ;;Dir is direction it is pointing and roll is how much the camera is rotated. mx and my are mouse coordinates
 ;;shots is a list of shots to draw and reload-time is time the player shot last
 ;;name and color are strings
-(struct/lens orb (pos time movekeys dir roll shots reload-time name color hostname port kills deaths) #:prefab)
+(struct/lens orb (pos vel time movekeys dir roll shots reload-time name color hostname port kills deaths) #:prefab)
 ;;player is a orb and enemys is a list of orbs
 (struct/lens orbs (player enemys) #:transparent);;enemys includes teammates, confusing!
 ;orbs is an orbs and exit? is wheather or not to stop the state and close the window
@@ -23,6 +24,7 @@
   [enemys orbs-enemys-lens]
   [player orbs-player-lens
     [pos orb-pos-lens]
+    [vel orb-vel-lens]
     [time orb-time-lens]
     [shots orb-shots-lens]
     [deaths orb-deaths-lens]
