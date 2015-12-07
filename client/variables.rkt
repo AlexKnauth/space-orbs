@@ -17,12 +17,12 @@
 (define DEFAULT-STATE
   (game
    'deathmatch
-   (orbs (orb DEFAULTPOS DEFAULTVEL 0 '() DEFAULTDIR 0 empty 0 "1" "blue" #f #f 0 0) empty)
+   (orbs (orb DEFAULTPOS DEFAULTVEL 0 '() DEFAULTDIR 0 0 empty 0 "1" "blue" #f #f 0 0) empty)
    #f
    #f
    0
    (set)))
-(define DEFAULT-ORB (orb DEFAULTPOS DEFAULTVEL 0 '() DEFAULTDIR 0 empty 0 "1" "blue" #f #f 0 0))
+(define DEFAULT-ORB (orb DEFAULTPOS DEFAULTVEL 0 '() DEFAULTDIR 0 0 empty 0 "1" "blue" #f #f 0 0))
 
 (define ORB-RADIUS 2)
 
@@ -36,7 +36,7 @@
 (define SERVER-ADRESS "10.0.1.12")
 (define CLIENT-ADRESS "c-67-166-78-233.hsd1.ut.comcast.net")
 
-(define TESTORB (orb (pos 1 1 1) DEFAULTVEL 5 '() (dir -1 0 0) 0 empty 0 "Bob" "blue" #f #f 0 0))
+(define TESTORB (orb (pos 1 1 1) DEFAULTVEL 5 '() (dir -1 0 0) 0 0 empty 0 "Bob" "blue" #f #f 0 0))
 
 (define DISCO? #f)
 

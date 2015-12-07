@@ -12,7 +12,7 @@
 ;;Dir is direction it is pointing and roll is how much the camera is rotated. mx and my are mouse coordinates
 ;;shots is a list of shots to draw and reload-time is time the player shot last
 ;;name and color are strings
-(struct/lens orb (pos vel time movekeys dir roll shots reload-time name color hostname port kills deaths) #:prefab)
+(struct/lens orb (pos vel time movekeys dir roll roll-vel shots reload-time name color hostname port kills deaths) #:prefab)
 ;;player is a orb and enemys is a list of orbs
 (struct/lens orbs (player enemys) #:transparent);;enemys includes teammates, confusing!
 ;orbs is an orbs and exit? is wheather or not to stop the state and close the window
