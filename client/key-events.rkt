@@ -100,15 +100,25 @@
   result)
 
 (define (on-player-release-result o n t lkey)
-  (struct-copy orb
-               o
-               [pos (current-pos o t)]
-               [time t]
-               [movekeys (remove-this-movekey (orb-movekeys o) lkey)]
-               [roll (current-roll o t)]))
+  (define roll (current-roll o t))
+  (cond
+    [(member lkey '("w" "a" "s" "d" " " "shift"))
+     (struct-copy orb o
+                  [pos (current-pos o t)]
+                  [time t]
+                  [vel (dir- (orb-vel o)
+                             (key-velocity lkey STARTING-SPEED (orb-dir o) roll))]
+                  [roll roll])]
+    [else
+     (struct-copy orb o
+                  [pos (current-pos o t)]
+                  [time t]
+                  [movekeys (remove-this-movekey (orb-movekeys o) lkey)]
+                  [roll roll])]))
 
-(module+ test (check-equal? (on-player-release (struct-copy orb TESTORB [pos (pos 2 2 2)] [movekeys (list (movekey " " 1))]) "n" 5 " ")
-              (struct-copy orb TESTORB [pos (pos 2 2 2)] [movekeys empty])))
+(module+ test
+  (check-equal? (on-player-release (struct-copy orb TESTORB [pos (pos 2 2 2)] [movekeys (list (movekey "a" 1))]) "n" 5 "a")
+                (struct-copy orb TESTORB [pos (pos 2 2 2)] [movekeys empty])))
 
 (define (remove-this-movekey ms key)
   (cond
