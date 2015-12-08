@@ -81,7 +81,7 @@
                o
                [pos (current-pos o t)]
                [time t]
-               [movekeys (movekeys-add-key (orb-movekeys o) lkey (- STARTING-SPEED))]
+               ;[movekeys (movekeys-add-key (orb-movekeys o) lkey (- STARTING-SPEED))]
                [roll (current-roll o t)]))
 
 (module+ test (check-equal? (on-player-release (struct-copy orb TESTORB [pos (pos 2 2 2)] [movekeys (space-movekey STARTING-SPEED)]) "n" 5 " ")
